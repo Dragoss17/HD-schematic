@@ -14,125 +14,147 @@
   }
   body {
     min-height: 100vh;
-    padding: 32px 16px;
+    padding: 36px 16px;
   }
   .header {
     text-align: center;
-    margin-bottom: 24px;
+    margin-bottom: 28px;
   }
   .header .meta-top {
-    font-size: 11px;
+    font-size: 12px;
     letter-spacing: 6px;
     color: #555;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
   }
   .header h1 {
-    font-size: 18px;
+    font-size: 22px;
     font-weight: 700;
-    letter-spacing: 4px;
+    letter-spacing: 5px;
     color: #d4a843;
     margin: 0;
   }
   .header .meta-bottom {
-    font-size: 10px;
-    letter-spacing: 3px;
+    font-size: 11px;
+    letter-spacing: 4px;
     color: #444;
-    margin-top: 6px;
+    margin-top: 8px;
   }
   .legend {
     display: flex;
     justify-content: center;
-    gap: 24px;
-    margin-bottom: 20px;
+    gap: 32px;
+    margin-bottom: 24px;
     flex-wrap: wrap;
   }
   .legend-item {
     display: flex;
     align-items: center;
-    gap: 7px;
-    font-size: 9px;
+    gap: 8px;
+    font-size: 10px;
     letter-spacing: 3px;
   }
   .legend-bar {
-    width: 28px;
-    height: 2px;
+    width: 32px;
+    height: 3px;
     border-radius: 1px;
   }
   .columns {
     display: flex;
     justify-content: space-between;
-    max-width: 800px;
-    margin: 0 auto 8px;
+    max-width: 980px;
+    margin: 0 auto 10px;
     padding: 0 16px;
   }
   .col-hd {
-    font-size: 9px;
+    font-size: 10px;
     letter-spacing: 4px;
     color: #d4a843;
-    width: 240px;
+    width: 300px;
   }
   .col-psych {
-    font-size: 9px;
+    font-size: 10px;
     letter-spacing: 4px;
     color: #7aa8c4;
     text-align: right;
-    width: 210px;
+    width: 260px;
   }
   .schematic-wrap {
-    max-width: 800px;
+    max-width: 980px;
     margin: 0 auto;
     position: relative;
   }
   svg { display: block; width: 100%; }
   .conn-path {
     cursor: pointer;
-    transition: all 0.2s;
     fill: none;
   }
+  .node-group {
+    cursor: pointer;
+  }
   .node-rect {
-    transition: all 0.2s;
+    transition: fill 0.2s, stroke 0.2s, stroke-width 0.2s;
   }
   .node-label {
     font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
     font-weight: 600;
     letter-spacing: 2px;
+    pointer-events: none;
   }
   .node-sub {
     font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
     letter-spacing: 1px;
+    pointer-events: none;
   }
   .tooltip {
-    min-height: 110px;
-    margin: 12px auto 0;
-    max-width: 560px;
-    padding: 18px 24px;
+    min-height: 130px;
+    margin: 16px auto 0;
+    max-width: 720px;
+    padding: 22px 28px;
     background: rgba(255,255,255,0.02);
     border: 1px solid #1a1a2a;
     border-radius: 6px;
-    transition: all 0.25s;
+    transition: background 0.25s, border-color 0.25s;
+  }
+  .tooltip-section + .tooltip-section {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255,255,255,0.06);
   }
   .tooltip-label {
-    font-size: 9px;
+    font-size: 10px;
     letter-spacing: 4px;
     margin-bottom: 10px;
   }
   .tooltip-desc {
-    font-size: 13px;
+    font-size: 15px;
     font-style: italic;
     color: #c8c8d8;
     line-height: 1.7;
   }
+  .tooltip-card-title {
+    font-size: 12px;
+    letter-spacing: 4px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .tooltip-card-sub {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: #555;
+    margin-bottom: 14px;
+    font-style: italic;
+  }
   .tooltip-empty {
-    font-size: 10px;
+    font-size: 11px;
     letter-spacing: 3px;
     color: #2a2a3a;
     text-align: center;
-    padding-top: 36px;
+    padding-top: 42px;
   }
   .footer {
     text-align: center;
-    margin-top: 28px;
-    font-size: 9px;
+    margin-top: 32px;
+    font-size: 10px;
     letter-spacing: 3px;
     color: #222;
   }
@@ -153,10 +175,10 @@
   </div>
 
   <div class="schematic-wrap">
-    <svg id="schematic" viewBox="0 0 800 668" xmlns="http://www.w3.org/2000/svg">
+    <svg id="schematic" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <filter id="glow">
-          <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
+        <filter id="glow" filterUnits="userSpaceOnUse" x="0" y="0" width="980" height="900">
+          <feGaussianBlur stdDeviation="3" result="coloredBlur" />
           <feMerge>
             <feMergeNode in="coloredBlur" />
             <feMergeNode in="SourceGraphic" />
@@ -166,14 +188,12 @@
       <g id="connections"></g>
       <g id="hd-nodes"></g>
       <g id="psych-nodes"></g>
+      <g id="highlights"></g>
     </svg>
 
     <div class="tooltip" id="tooltip">
-      <div class="tooltip-empty" id="tooltip-empty">HOVER A CONNECTION LINE TO READ</div>
-      <div id="tooltip-content" style="display:none;">
-        <div class="tooltip-label" id="tooltip-label"></div>
-        <div class="tooltip-desc" id="tooltip-desc"></div>
-      </div>
+      <div class="tooltip-empty" id="tooltip-empty">HOVER A LINE OR CLICK A CARD TO READ</div>
+      <div id="tooltip-content" style="display:none;"></div>
     </div>
   </div>
 
@@ -253,17 +273,18 @@ const CONNECTIONS = [
 ];
 
 const TYPE_STYLES = {
-  tension: { stroke: "#c0392b", label: "#e74c3c", bg: "rgba(192,57,43,0.12)" },
-  mirror:  { stroke: "#c9a84c", label: "#f1c40f", bg: "rgba(201,168,76,0.12)" },
-  amplify: { stroke: "#5b8dee", label: "#7fb3f5", bg: "rgba(91,141,238,0.12)" },
+  tension: { stroke: "#e74c3c", label: "#ff6b5e", bg: "rgba(231,76,60,0.14)" },
+  mirror:  { stroke: "#e8c44e", label: "#f5d54e", bg: "rgba(232,196,78,0.14)" },
+  amplify: { stroke: "#5b8dee", label: "#7fb3f5", bg: "rgba(91,141,238,0.14)" },
 };
 
-const NODE_H = 64;
-const NODE_W = 210;
-const V_GAP = 84;
-const LEFT_X = 30;
-const RIGHT_X = 560;
-const SVG_W = 800;
+// === Sizing ===
+const NODE_H = 80;
+const NODE_W = 260;
+const V_GAP = 100;
+const LEFT_X = 40;
+const SVG_W = 980;
+const RIGHT_X = SVG_W - LEFT_X - NODE_W;  // 680
 const PSYCH_ROWS = 7;
 const HD_ROWS = 6;
 const SVG_H = Math.max(HD_ROWS, PSYCH_ROWS) * V_GAP + 80;
@@ -278,9 +299,11 @@ function bezierPath(x1, y1, x2, y2) {
   return `M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}`;
 }
 
-let activeIndex = null;
+// === State ===
+let hoveredConn = null;     // index of connection being hovered
+let selectedCard = null;    // id of card currently pressed (HD or psych)
 
-// Build legend
+// === Build legend ===
 const legendEl = document.getElementById("legend");
 [
   { type: "tension", label: "TENSION" },
@@ -298,172 +321,259 @@ const legendEl = document.getElementById("legend");
   legendEl.appendChild(item);
 });
 
-// Build connections
+// === Set viewBox ===
+document.getElementById("schematic").setAttribute("viewBox", `0 0 ${SVG_W} ${SVG_H}`);
+
+// === Build connections (base + highlight twins) ===
 const connG = document.getElementById("connections");
+const highlightG = document.getElementById("highlights");
 const connPaths = [];
+const highlightPaths = [];
+
 CONNECTIONS.forEach((conn, i) => {
   const hdNode = HD_NODES.find(n => n.id === conn.hd);
   const psychNode = PSYCH_NODES.find(n => n.id === conn.psych);
   const a = hdCenter(hdNode);
   const b = psychCenter(psychNode);
   const style = TYPE_STYLES[conn.type];
+  const d = bezierPath(a.x, a.y, b.x, b.y);
 
+  // Base (always visible) path
   const path = document.createElementNS(SVG_NS, "path");
-  path.setAttribute("d", bezierPath(a.x, a.y, b.x, b.y));
+  path.setAttribute("d", d);
   path.setAttribute("stroke", style.stroke);
-  path.setAttribute("stroke-width", "1.2");
-  path.setAttribute("stroke-opacity", "0.45");
+  path.setAttribute("stroke-width", "3");
+  path.setAttribute("stroke-opacity", "0.85");
+  path.setAttribute("fill", "none");
   path.setAttribute("class", "conn-path");
-  path.addEventListener("mouseenter", () => setActive(i));
-  path.addEventListener("mouseleave", () => setActive(null));
+  path.addEventListener("mouseenter", () => { hoveredConn = i; updateView(); });
+  path.addEventListener("mouseleave", () => { hoveredConn = null; updateView(); });
   connG.appendChild(path);
   connPaths.push(path);
+
+  // Twin highlight path — drawn on top, only shown when conn is active
+  const hl = document.createElementNS(SVG_NS, "path");
+  hl.setAttribute("d", d);
+  hl.setAttribute("stroke", style.stroke);
+  hl.setAttribute("stroke-width", "6");
+  hl.setAttribute("stroke-opacity", "1");
+  hl.setAttribute("fill", "none");
+  hl.setAttribute("filter", "url(#glow)");
+  hl.setAttribute("pointer-events", "none");
+  hl.setAttribute("visibility", "hidden");
+  highlightG.appendChild(hl);
+  highlightPaths.push(hl);
 });
 
-// Build HD nodes
+// === Build node helper ===
+function buildNode(node, side) {
+  const isHd = side === "hd";
+  const x = isHd ? LEFT_X : RIGHT_X;
+  const labelColor = isHd ? "#d4a843" : "#9ab8cc";
+  const subColor = isHd ? "#7a6830" : "#2e5268";
+
+  const g = document.createElementNS(SVG_NS, "g");
+  g.setAttribute("class", "node-group");
+  g.dataset.cardId = node.id;
+  g.dataset.side = side;
+
+  const rect = document.createElementNS(SVG_NS, "rect");
+  rect.setAttribute("x", x);
+  rect.setAttribute("y", nodeY(node.y));
+  rect.setAttribute("width", NODE_W);
+  rect.setAttribute("height", NODE_H);
+  rect.setAttribute("rx", 5);
+  rect.setAttribute("class", "node-rect");
+  g.appendChild(rect);
+
+  const t1 = document.createElementNS(SVG_NS, "text");
+  t1.setAttribute("x", x + 18);
+  t1.setAttribute("y", nodeY(node.y) + 32);
+  t1.setAttribute("fill", labelColor);
+  t1.setAttribute("font-size", "12");
+  t1.setAttribute("class", "node-label");
+  t1.textContent = node.label;
+  g.appendChild(t1);
+
+  const t2 = document.createElementNS(SVG_NS, "text");
+  t2.setAttribute("x", x + 18);
+  t2.setAttribute("y", nodeY(node.y) + 54);
+  t2.setAttribute("fill", subColor);
+  t2.setAttribute("font-size", "11");
+  t2.setAttribute("class", "node-sub");
+  t2.textContent = node.sub;
+  g.appendChild(t2);
+
+  // Click toggles selection
+  g.addEventListener("click", () => {
+    selectedCard = (selectedCard === node.id) ? null : node.id;
+    updateView();
+  });
+
+  return { group: g, rect };
+}
+
+// === Build HD nodes ===
 const hdG = document.getElementById("hd-nodes");
 const hdRects = {};
 HD_NODES.forEach(node => {
-  const g = document.createElementNS(SVG_NS, "g");
-
-  const rect = document.createElementNS(SVG_NS, "rect");
-  rect.setAttribute("x", LEFT_X);
-  rect.setAttribute("y", nodeY(node.y));
-  rect.setAttribute("width", NODE_W);
-  rect.setAttribute("height", NODE_H);
-  rect.setAttribute("rx", 4);
-  rect.setAttribute("fill", "rgba(212,168,67,0.04)");
-  rect.setAttribute("stroke", "#2a2415");
-  rect.setAttribute("stroke-width", "1");
-  rect.setAttribute("class", "node-rect");
-  g.appendChild(rect);
+  const { group, rect } = buildNode(node, "hd");
+  hdG.appendChild(group);
   hdRects[node.id] = rect;
-
-  const t1 = document.createElementNS(SVG_NS, "text");
-  t1.setAttribute("x", LEFT_X + 14);
-  t1.setAttribute("y", nodeY(node.y) + 24);
-  t1.setAttribute("fill", "#d4a843");
-  t1.setAttribute("font-size", "10");
-  t1.setAttribute("class", "node-label");
-  t1.textContent = node.label;
-  g.appendChild(t1);
-
-  const t2 = document.createElementNS(SVG_NS, "text");
-  t2.setAttribute("x", LEFT_X + 14);
-  t2.setAttribute("y", nodeY(node.y) + 42);
-  t2.setAttribute("fill", "#7a6830");
-  t2.setAttribute("font-size", "9");
-  t2.setAttribute("class", "node-sub");
-  t2.textContent = node.sub;
-  g.appendChild(t2);
-
-  hdG.appendChild(g);
 });
 
-// Build psych nodes
+// === Build Psych nodes ===
 const psychG = document.getElementById("psych-nodes");
 const psychRects = {};
 PSYCH_NODES.forEach(node => {
-  const g = document.createElementNS(SVG_NS, "g");
-
-  const rect = document.createElementNS(SVG_NS, "rect");
-  rect.setAttribute("x", RIGHT_X);
-  rect.setAttribute("y", nodeY(node.y));
-  rect.setAttribute("width", NODE_W);
-  rect.setAttribute("height", NODE_H);
-  rect.setAttribute("rx", 4);
-  rect.setAttribute("fill", "rgba(122,168,196,0.04)");
-  rect.setAttribute("stroke", "#152030");
-  rect.setAttribute("stroke-width", "1");
-  rect.setAttribute("class", "node-rect");
-  g.appendChild(rect);
+  const { group, rect } = buildNode(node, "psych");
+  psychG.appendChild(group);
   psychRects[node.id] = rect;
-
-  const t1 = document.createElementNS(SVG_NS, "text");
-  t1.setAttribute("x", RIGHT_X + 14);
-  t1.setAttribute("y", nodeY(node.y) + 24);
-  t1.setAttribute("fill", "#9ab8cc");
-  t1.setAttribute("font-size", "10");
-  t1.setAttribute("class", "node-label");
-  t1.textContent = node.label;
-  g.appendChild(t1);
-
-  const t2 = document.createElementNS(SVG_NS, "text");
-  t2.setAttribute("x", RIGHT_X + 14);
-  t2.setAttribute("y", nodeY(node.y) + 42);
-  t2.setAttribute("fill", "#2e5268");
-  t2.setAttribute("font-size", "9");
-  t2.setAttribute("class", "node-sub");
-  t2.textContent = node.sub;
-  g.appendChild(t2);
-
-  psychG.appendChild(g);
 });
 
-// Set viewBox dynamically
-document.getElementById("schematic").setAttribute("viewBox", `0 0 ${SVG_W} ${SVG_H}`);
-
-// Active state handler
+// === Tooltip elements ===
 const tooltipEl = document.getElementById("tooltip");
 const tooltipEmpty = document.getElementById("tooltip-empty");
 const tooltipContent = document.getElementById("tooltip-content");
-const tooltipLabel = document.getElementById("tooltip-label");
-const tooltipDesc = document.getElementById("tooltip-desc");
 
-function setActive(i) {
-  activeIndex = i;
+// === Style helpers for nodes ===
+function styleHdRect(rect, level) {
+  // level: 0 = idle, 1 = related (lit by hover/selection), 2 = selected card itself
+  if (level === 2) {
+    rect.setAttribute("fill", "rgba(212,168,67,0.20)");
+    rect.setAttribute("stroke", "#d4a843");
+    rect.setAttribute("stroke-width", "2");
+  } else if (level === 1) {
+    rect.setAttribute("fill", "rgba(212,168,67,0.13)");
+    rect.setAttribute("stroke", "#d4a843");
+    rect.setAttribute("stroke-width", "1.5");
+  } else {
+    rect.setAttribute("fill", "rgba(212,168,67,0.04)");
+    rect.setAttribute("stroke", "#2a2415");
+    rect.setAttribute("stroke-width", "1");
+  }
+}
+function stylePsychRect(rect, level) {
+  if (level === 2) {
+    rect.setAttribute("fill", "rgba(122,168,196,0.20)");
+    rect.setAttribute("stroke", "#7aa8c4");
+    rect.setAttribute("stroke-width", "2");
+  } else if (level === 1) {
+    rect.setAttribute("fill", "rgba(122,168,196,0.13)");
+    rect.setAttribute("stroke", "#7aa8c4");
+    rect.setAttribute("stroke-width", "1.5");
+  } else {
+    rect.setAttribute("fill", "rgba(122,168,196,0.04)");
+    rect.setAttribute("stroke", "#152030");
+    rect.setAttribute("stroke-width", "1");
+  }
+}
 
-  // Update connection paths
-  connPaths.forEach((p, idx) => {
-    const conn = CONNECTIONS[idx];
-    const style = TYPE_STYLES[conn.type];
-    if (i === idx) {
-      p.setAttribute("stroke-width", "2.5");
-      p.setAttribute("stroke-opacity", "1");
-      p.setAttribute("filter", "url(#glow)");
-    } else {
-      p.setAttribute("stroke-width", "1.2");
-      p.setAttribute("stroke-opacity", i === null ? "0.45" : "0.12");
-      p.removeAttribute("filter");
-    }
+// === Render based on state ===
+function updateView() {
+  // Determine which connection indices are "active" (highlighted)
+  let activeConnIndices = [];
+  if (hoveredConn !== null) {
+    activeConnIndices = [hoveredConn];
+  } else if (selectedCard !== null) {
+    CONNECTIONS.forEach((c, idx) => {
+      if (c.hd === selectedCard || c.psych === selectedCard) activeConnIndices.push(idx);
+    });
+  }
+
+  // Update highlight paths
+  highlightPaths.forEach((hl, idx) => {
+    hl.setAttribute("visibility", activeConnIndices.includes(idx) ? "visible" : "hidden");
   });
 
-  // Update HD node highlights
+  // Compute card highlight levels
+  // level 2 = the selected card itself
+  // level 1 = a card connected to the active set
   HD_NODES.forEach(node => {
-    const rect = hdRects[node.id];
-    const related = i !== null && CONNECTIONS[i].hd === node.id;
-    rect.setAttribute("fill", related ? "rgba(212,168,67,0.13)" : "rgba(212,168,67,0.04)");
-    rect.setAttribute("stroke", related ? "#d4a843" : "#2a2415");
-    rect.setAttribute("stroke-width", related ? "1.5" : "1");
+    let level = 0;
+    if (selectedCard === node.id) level = 2;
+    else if (activeConnIndices.some(idx => CONNECTIONS[idx].hd === node.id)) level = 1;
+    styleHdRect(hdRects[node.id], level);
   });
-
-  // Update Psych node highlights
   PSYCH_NODES.forEach(node => {
-    const rect = psychRects[node.id];
-    const related = i !== null && CONNECTIONS[i].psych === node.id;
-    rect.setAttribute("fill", related ? "rgba(122,168,196,0.13)" : "rgba(122,168,196,0.04)");
-    rect.setAttribute("stroke", related ? "#7aa8c4" : "#152030");
-    rect.setAttribute("stroke-width", related ? "1.5" : "1");
+    let level = 0;
+    if (selectedCard === node.id) level = 2;
+    else if (activeConnIndices.some(idx => CONNECTIONS[idx].psych === node.id)) level = 1;
+    stylePsychRect(psychRects[node.id], level);
   });
 
   // Update tooltip
-  if (i !== null) {
-    const conn = CONNECTIONS[i];
-    const style = TYPE_STYLES[conn.type];
-    tooltipEl.style.background = style.bg;
-    tooltipEl.style.borderColor = style.stroke;
-    tooltipLabel.style.color = style.label;
-    tooltipLabel.textContent = conn.label;
-    tooltipDesc.textContent = conn.desc;
-    tooltipEmpty.style.display = "none";
-    tooltipContent.style.display = "block";
+  if (hoveredConn !== null) {
+    showConnectionTooltip(CONNECTIONS[hoveredConn]);
+  } else if (selectedCard !== null) {
+    showCardTooltip(selectedCard);
   } else {
-    tooltipEl.style.background = "rgba(255,255,255,0.02)";
-    tooltipEl.style.borderColor = "#1a1a2a";
-    tooltipEmpty.style.display = "block";
-    tooltipContent.style.display = "none";
+    showEmptyTooltip();
   }
 }
+
+function showConnectionTooltip(conn) {
+  const style = TYPE_STYLES[conn.type];
+  tooltipEl.style.background = style.bg;
+  tooltipEl.style.borderColor = style.stroke;
+  tooltipEmpty.style.display = "none";
+  tooltipContent.style.display = "block";
+  tooltipContent.innerHTML = `
+    <div class="tooltip-section">
+      <div class="tooltip-label" style="color:${style.label};">${conn.label}</div>
+      <div class="tooltip-desc">${escapeHtml(conn.desc)}</div>
+    </div>
+  `;
+}
+
+function showCardTooltip(cardId) {
+  const isHd = HD_NODES.some(n => n.id === cardId);
+  const cardNode = (isHd ? HD_NODES : PSYCH_NODES).find(n => n.id === cardId);
+  const accent = isHd ? "#d4a843" : "#7aa8c4";
+  const bgTint = isHd ? "rgba(212,168,67,0.08)" : "rgba(122,168,196,0.08)";
+  const related = CONNECTIONS.filter(c => c.hd === cardId || c.psych === cardId);
+
+  tooltipEl.style.background = bgTint;
+  tooltipEl.style.borderColor = accent;
+  tooltipEmpty.style.display = "none";
+  tooltipContent.style.display = "block";
+
+  const sectionsHtml = related.length === 0
+    ? `<div class="tooltip-desc" style="opacity:0.7;">No connections mapped for this node.</div>`
+    : related.map(c => {
+        const s = TYPE_STYLES[c.type];
+        return `
+          <div class="tooltip-section">
+            <div class="tooltip-label" style="color:${s.label};">${c.label}</div>
+            <div class="tooltip-desc">${escapeHtml(c.desc)}</div>
+          </div>
+        `;
+      }).join("");
+
+  tooltipContent.innerHTML = `
+    <div class="tooltip-card-title" style="color:${accent};">${escapeHtml(cardNode.label)}</div>
+    <div class="tooltip-card-sub">${escapeHtml(cardNode.sub)}</div>
+    ${sectionsHtml}
+  `;
+}
+
+function showEmptyTooltip() {
+  tooltipEl.style.background = "rgba(255,255,255,0.02)";
+  tooltipEl.style.borderColor = "#1a1a2a";
+  tooltipEmpty.style.display = "block";
+  tooltipContent.style.display = "none";
+  tooltipContent.innerHTML = "";
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+// Initial paint
+updateView();
 </script>
 </body>
 </html>
