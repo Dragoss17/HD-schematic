@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Human Design × Psychological Profile — Cross-System Schematic</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #08080f;
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #ccc;
+  }
+  body {
+    min-height: 100vh;
+    padding: 32px 16px;
+  }
+  .header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .header .meta-top {
+    font-size: 11px;
+    letter-spacing: 6px;
+    color: #555;
+    margin-bottom: 6px;
+  }
+  .header h1 {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: #d4a843;
+    margin: 0;
+  }
+  .header .meta-bottom {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: #444;
+    margin-top: 6px;
+  }
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 9px;
+    letter-spacing: 3px;
+  }
+  .legend-bar {
+    width: 28px;
+    height: 2px;
+    border-radius: 1px;
+  }
+  .columns {
+    display: flex;
+    justify-content: space-between;
+    max-width: 800px;
+    margin: 0 auto 8px;
+    padding: 0 16px;
+  }
+  .col-hd {
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: #d4a843;
+    width: 240px;
+  }
+  .col-psych {
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: #7aa8c4;
+    text-align: right;
+    width: 210px;
+  }
+  .schematic-wrap {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+  }
+  svg { display: block; width: 100%; }
+  .conn-path {
+    cursor: pointer;
+    transition: all 0.2s;
+    fill: none;
+  }
+  .node-rect {
+    transition: all 0.2s;
+  }
+  .node-label {
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 600;
+    letter-spacing: 2px;
+  }
+  .node-sub {
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: 1px;
+  }
+  .tooltip {
+    min-height: 110px;
+    margin: 12px auto 0;
+    max-width: 560px;
+    padding: 18px 24px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid #1a1a2a;
+    border-radius: 6px;
+    transition: all 0.25s;
+  }
+  .tooltip-label {
+    font-size: 9px;
+    letter-spacing: 4px;
+    margin-bottom: 10px;
+  }
+  .tooltip-desc {
+    font-size: 13px;
+    font-style: italic;
+    color: #c8c8d8;
+    line-height: 1.7;
+  }
+  .tooltip-empty {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: #2a2a3a;
+    text-align: center;
+    padding-top: 36px;
+  }
+  .footer {
+    text-align: center;
+    margin-top: 28px;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: #222;
+  }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="meta-top">DRAGOS · MAY 17 1993 · CÂMPULUNG</div>
+    <h1>HUMAN DESIGN × PSYCHOLOGICAL PROFILE</h1>
+    <div class="meta-bottom">CROSS-SYSTEM SCHEMATIC</div>
+  </div>
+
+  <div class="legend" id="legend"></div>
+
+  <div class="columns">
+    <div class="col-hd">HUMAN DESIGN</div>
+    <div class="col-psych">PSYCHOLOGICAL PROFILE</div>
+  </div>
+
+  <div class="schematic-wrap">
+    <svg id="schematic" viewBox="0 0 800 668" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
+          <feMerge>
+            <feMergeNode in="coloredBlur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+      <g id="connections"></g>
+      <g id="hd-nodes"></g>
+      <g id="psych-nodes"></g>
+    </svg>
+
+    <div class="tooltip" id="tooltip">
+      <div class="tooltip-empty" id="tooltip-empty">HOVER A CONNECTION LINE TO READ</div>
+      <div id="tooltip-content" style="display:none;">
+        <div class="tooltip-label" id="tooltip-label"></div>
+        <div class="tooltip-desc" id="tooltip-desc"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    RIGHT ANGLE CROSS OF CONTAGION · 8/14 · 30/29 · SINGLE DEFINITION
+  </div>
+
+<script>
+const HD_NODES = [
+  { id: "manifestor", label: "MANIFESTOR", sub: "Type", y: 0 },
+  { id: "inform", label: "TO INFORM", sub: "Strategy", y: 1 },
+  { id: "ego", label: "EGO MANIFESTED", sub: "Inner Authority", y: 2 },
+  { id: "profile", label: "2 / 4", sub: "Hermit · Opportunist", y: 3 },
+  { id: "channel", label: "CHANNEL 21–45", sub: "Material Will", y: 4 },
+  { id: "gates", label: "GATES 29·30·48·61·63", sub: "Key Active Gates", y: 5 },
+];
+
+const PSYCH_NODES = [
+  { id: "eval", label: "EVALUATION TERROR", sub: "Central Wound", y: 0 },
+  { id: "stealth", label: "STEALTH REFLEX", sub: "Sentry · Visibility Wound", y: 1 },
+  { id: "second", label: "SECOND-PLACE WOUND", sub: "Worth · Desire Eroded", y: 2 },
+  { id: "dual", label: "SOLITUDE + NETWORK", sub: "Dual Structural Need", y: 3 },
+  { id: "care", label: "CARETAKING TRAP", sub: "Relational Shadow", y: 4 },
+  { id: "mind3am", label: "3AM MIND", sub: "Inner Truth · Doubt Loop", y: 5 },
+  { id: "anger", label: "UNEXPRESSED ANGER", sub: "Signal Without Channel", y: 6 },
+];
+
+const CONNECTIONS = [
+  {
+    hd: "manifestor", psych: "eval",
+    type: "tension",
+    label: "CORE TENSION",
+    desc: "Manifestors are built to initiate freely and impact without restriction. Evaluation Terror shuts down initiation at the exact point of expression — the wound lives inside the mechanism.",
+  },
+  {
+    hd: "inform", psych: "stealth",
+    type: "tension",
+    label: "DIRECT CONFLICT",
+    desc: "The Strategy requires visibility — informing others before acting. The Stealth Reflex learned that visibility = target. These point in exactly opposite directions.",
+  },
+  {
+    hd: "ego", psych: "second",
+    type: "tension",
+    label: "UNDERMINED AUTHORITY",
+    desc: "Ego Manifested means decisions should come from genuine heart-desire and self-worth. The Second-Place Wound lives in the same center — the authority keeps being told it isn't enough.",
+  },
+  {
+    hd: "profile", psych: "dual",
+    type: "mirror",
+    label: "PERFECT MIRROR",
+    desc: "Line 2 (Hermit) explains the solitude need, the 3am hours, the mountain freedom. Line 4 (Opportunist) explains the relational abundance — multiple deep friend groups, life moving through network.",
+  },
+  {
+    hd: "channel", psych: "care",
+    type: "mirror",
+    label: "CHANNEL SHADOW",
+    desc: "Channel 21–45 governs material mastery and 'what's mine is mine.' Its shadow is overextension into provision — becoming the floor others stand on rather than a person who stands beside them.",
+  },
+  {
+    hd: "gates", psych: "mind3am",
+    type: "mirror",
+    label: "DIRECT EXPRESSION",
+    desc: "Gate 61 is the inner pressure toward mystery — the 3am mind that won't quiet. Gate 63 is the doubt apparatus — the automatic pre-expression scan the profile calls the Sentry. Gate 48 is the fear of not being deep enough, not yet ready.",
+  },
+  {
+    hd: "gates", psych: "anger",
+    type: "mirror",
+    label: "FREQUENCY MATCH",
+    desc: "Gate 30 is emotional fire, longing, desire that can't fully resolve — melancholy as a native frequency. Gate 29 at its shadow says yes to everything and becomes the resource others drain.",
+  },
+  {
+    hd: "manifestor", psych: "anger",
+    type: "amplify",
+    label: "CAUSAL LINK",
+    desc: "Manifestor Not-Self Anger is specifically the biological signal of blocked initiation. The calibrated, internal, nowhere-to-go anger in the profile is not just emotional — it's the type responding to structural obstruction.",
+  },
+];
+
+const TYPE_STYLES = {
+  tension: { stroke: "#c0392b", label: "#e74c3c", bg: "rgba(192,57,43,0.12)" },
+  mirror:  { stroke: "#c9a84c", label: "#f1c40f", bg: "rgba(201,168,76,0.12)" },
+  amplify: { stroke: "#5b8dee", label: "#7fb3f5", bg: "rgba(91,141,238,0.12)" },
+};
+
+const NODE_H = 64;
+const NODE_W = 210;
+const V_GAP = 84;
+const LEFT_X = 30;
+const RIGHT_X = 560;
+const SVG_W = 800;
+const PSYCH_ROWS = 7;
+const HD_ROWS = 6;
+const SVG_H = Math.max(HD_ROWS, PSYCH_ROWS) * V_GAP + 80;
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+function nodeY(index) { return 40 + index * V_GAP; }
+function hdCenter(node) { return { x: LEFT_X + NODE_W, y: nodeY(node.y) + NODE_H / 2 }; }
+function psychCenter(node) { return { x: RIGHT_X, y: nodeY(node.y) + NODE_H / 2 }; }
+function bezierPath(x1, y1, x2, y2) {
+  const cx = (x1 + x2) / 2;
+  return `M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}`;
+}
+
+let activeIndex = null;
+
+// Build legend
+const legendEl = document.getElementById("legend");
+[
+  { type: "tension", label: "TENSION" },
+  { type: "mirror",  label: "MIRROR" },
+  { type: "amplify", label: "AMPLIFIES" },
+].forEach(({ type, label }) => {
+  const item = document.createElement("div");
+  item.className = "legend-item";
+  item.style.color = TYPE_STYLES[type].label;
+  const bar = document.createElement("div");
+  bar.className = "legend-bar";
+  bar.style.background = TYPE_STYLES[type].stroke;
+  item.appendChild(bar);
+  item.appendChild(document.createTextNode(label));
+  legendEl.appendChild(item);
+});
+
+// Build connections
+const connG = document.getElementById("connections");
+const connPaths = [];
+CONNECTIONS.forEach((conn, i) => {
+  const hdNode = HD_NODES.find(n => n.id === conn.hd);
+  const psychNode = PSYCH_NODES.find(n => n.id === conn.psych);
+  const a = hdCenter(hdNode);
+  const b = psychCenter(psychNode);
+  const style = TYPE_STYLES[conn.type];
+
+  const path = document.createElementNS(SVG_NS, "path");
+  path.setAttribute("d", bezierPath(a.x, a.y, b.x, b.y));
+  path.setAttribute("stroke", style.stroke);
+  path.setAttribute("stroke-width", "1.2");
+  path.setAttribute("stroke-opacity", "0.45");
+  path.setAttribute("class", "conn-path");
+  path.addEventListener("mouseenter", () => setActive(i));
+  path.addEventListener("mouseleave", () => setActive(null));
+  connG.appendChild(path);
+  connPaths.push(path);
+});
+
+// Build HD nodes
+const hdG = document.getElementById("hd-nodes");
+const hdRects = {};
+HD_NODES.forEach(node => {
+  const g = document.createElementNS(SVG_NS, "g");
+
+  const rect = document.createElementNS(SVG_NS, "rect");
+  rect.setAttribute("x", LEFT_X);
+  rect.setAttribute("y", nodeY(node.y));
+  rect.setAttribute("width", NODE_W);
+  rect.setAttribute("height", NODE_H);
+  rect.setAttribute("rx", 4);
+  rect.setAttribute("fill", "rgba(212,168,67,0.04)");
+  rect.setAttribute("stroke", "#2a2415");
+  rect.setAttribute("stroke-width", "1");
+  rect.setAttribute("class", "node-rect");
+  g.appendChild(rect);
+  hdRects[node.id] = rect;
+
+  const t1 = document.createElementNS(SVG_NS, "text");
+  t1.setAttribute("x", LEFT_X + 14);
+  t1.setAttribute("y", nodeY(node.y) + 24);
+  t1.setAttribute("fill", "#d4a843");
+  t1.setAttribute("font-size", "10");
+  t1.setAttribute("class", "node-label");
+  t1.textContent = node.label;
+  g.appendChild(t1);
+
+  const t2 = document.createElementNS(SVG_NS, "text");
+  t2.setAttribute("x", LEFT_X + 14);
+  t2.setAttribute("y", nodeY(node.y) + 42);
+  t2.setAttribute("fill", "#7a6830");
+  t2.setAttribute("font-size", "9");
+  t2.setAttribute("class", "node-sub");
+  t2.textContent = node.sub;
+  g.appendChild(t2);
+
+  hdG.appendChild(g);
+});
+
+// Build psych nodes
+const psychG = document.getElementById("psych-nodes");
+const psychRects = {};
+PSYCH_NODES.forEach(node => {
+  const g = document.createElementNS(SVG_NS, "g");
+
+  const rect = document.createElementNS(SVG_NS, "rect");
+  rect.setAttribute("x", RIGHT_X);
+  rect.setAttribute("y", nodeY(node.y));
+  rect.setAttribute("width", NODE_W);
+  rect.setAttribute("height", NODE_H);
+  rect.setAttribute("rx", 4);
+  rect.setAttribute("fill", "rgba(122,168,196,0.04)");
+  rect.setAttribute("stroke", "#152030");
+  rect.setAttribute("stroke-width", "1");
+  rect.setAttribute("class", "node-rect");
+  g.appendChild(rect);
+  psychRects[node.id] = rect;
+
+  const t1 = document.createElementNS(SVG_NS, "text");
+  t1.setAttribute("x", RIGHT_X + 14);
+  t1.setAttribute("y", nodeY(node.y) + 24);
+  t1.setAttribute("fill", "#9ab8cc");
+  t1.setAttribute("font-size", "10");
+  t1.setAttribute("class", "node-label");
+  t1.textContent = node.label;
+  g.appendChild(t1);
+
+  const t2 = document.createElementNS(SVG_NS, "text");
+  t2.setAttribute("x", RIGHT_X + 14);
+  t2.setAttribute("y", nodeY(node.y) + 42);
+  t2.setAttribute("fill", "#2e5268");
+  t2.setAttribute("font-size", "9");
+  t2.setAttribute("class", "node-sub");
+  t2.textContent = node.sub;
+  g.appendChild(t2);
+
+  psychG.appendChild(g);
+});
+
+// Set viewBox dynamically
+document.getElementById("schematic").setAttribute("viewBox", `0 0 ${SVG_W} ${SVG_H}`);
+
+// Active state handler
+const tooltipEl = document.getElementById("tooltip");
+const tooltipEmpty = document.getElementById("tooltip-empty");
+const tooltipContent = document.getElementById("tooltip-content");
+const tooltipLabel = document.getElementById("tooltip-label");
+const tooltipDesc = document.getElementById("tooltip-desc");
+
+function setActive(i) {
+  activeIndex = i;
+
+  // Update connection paths
+  connPaths.forEach((p, idx) => {
+    const conn = CONNECTIONS[idx];
+    const style = TYPE_STYLES[conn.type];
+    if (i === idx) {
+      p.setAttribute("stroke-width", "2.5");
+      p.setAttribute("stroke-opacity", "1");
+      p.setAttribute("filter", "url(#glow)");
+    } else {
+      p.setAttribute("stroke-width", "1.2");
+      p.setAttribute("stroke-opacity", i === null ? "0.45" : "0.12");
+      p.removeAttribute("filter");
+    }
+  });
+
+  // Update HD node highlights
+  HD_NODES.forEach(node => {
+    const rect = hdRects[node.id];
+    const related = i !== null && CONNECTIONS[i].hd === node.id;
+    rect.setAttribute("fill", related ? "rgba(212,168,67,0.13)" : "rgba(212,168,67,0.04)");
+    rect.setAttribute("stroke", related ? "#d4a843" : "#2a2415");
+    rect.setAttribute("stroke-width", related ? "1.5" : "1");
+  });
+
+  // Update Psych node highlights
+  PSYCH_NODES.forEach(node => {
+    const rect = psychRects[node.id];
+    const related = i !== null && CONNECTIONS[i].psych === node.id;
+    rect.setAttribute("fill", related ? "rgba(122,168,196,0.13)" : "rgba(122,168,196,0.04)");
+    rect.setAttribute("stroke", related ? "#7aa8c4" : "#152030");
+    rect.setAttribute("stroke-width", related ? "1.5" : "1");
+  });
+
+  // Update tooltip
+  if (i !== null) {
+    const conn = CONNECTIONS[i];
+    const style = TYPE_STYLES[conn.type];
+    tooltipEl.style.background = style.bg;
+    tooltipEl.style.borderColor = style.stroke;
+    tooltipLabel.style.color = style.label;
+    tooltipLabel.textContent = conn.label;
+    tooltipDesc.textContent = conn.desc;
+    tooltipEmpty.style.display = "none";
+    tooltipContent.style.display = "block";
+  } else {
+    tooltipEl.style.background = "rgba(255,255,255,0.02)";
+    tooltipEl.style.borderColor = "#1a1a2a";
+    tooltipEmpty.style.display = "block";
+    tooltipContent.style.display = "none";
+  }
+}
+</script>
+</body>
+</html>
